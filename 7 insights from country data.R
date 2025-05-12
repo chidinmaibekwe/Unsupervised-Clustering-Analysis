@@ -1,24 +1,31 @@
+
+#visualize country and gdpp
 library(dplyr)
 library(ggplot2)
 cnt_data<-readr::read_csv(".\\umldata\\Country-data.csv")
-
 View(cnt_data)
 
-#average GDP per capita across country
-average_gdp <- cnt_data %>% 
-  group_by (country) %>%
-summarise(avg_gdp= mean(gdpp, na.rm = TRUE ))
-print(average_gdp)
+#top 10 countries based on gdp
+top_ten_gdp <- cnt_data %>%
+  arrange(desc(gdpp))%>%
+  head(10)
+  
+ggplot(data = top_ten_gdp, aes(x = country, y = gdpp )) + 
+  geom_bar(stat =  "identity")+ labs(title = "Top ten countries with the highest gdpp", x= "country", y= "gdpp") + ylim(0,max(cnt_data$gdpp)*1.1)+
+  geom_hline(yintercept = mean(cnt_data$inflation), color="red", linetype = "dashed")+theme (legend.position = "none")
 
 #which country has the highest life expectancy?
 highest_life_expentancy <- cnt_data %>%
   filter(life_expec == max(life_expec,na.rm = TRUE))
 print(highest_life_expentancy)
+cnt_data(cnt_data$life_expec == "Japan",)
 
 #what is the correlation between GDP per capita and life expectancy?
 correlation <- cor(cnt_data$gdpp, cnt_data$life_expec,use = "pairwise.complete.obs")
 print(correlation)
-
+ggplot(cnt_data, aes(x = life_expec, y = gdpp, colour = "red" ))+
+  geom_point()
+  
 #Which country has the lowest imports
 lowest_import <- cnt_data %>%
   filter(imports == min(imports, na.rm = TRUE))
@@ -30,8 +37,7 @@ correlation <- cor(cnt_data$income, cnt_data$child_mort,
                    use = "pairwise.complete.obs")
 print(correlation)
 ggplot(cnt_data, aes(x = income, y = child_mort))+
-  geom_point()+
-  geom_smooth(method = "lm")
+  geom_point()
 
 #countries with the highest and lowest total fertility rates
 highest_total_fertility <- cnt_data %>%
@@ -47,6 +53,7 @@ print(correlation)
 ggplot(cnt_data,aes(x = total_fer, y = child_mort))+
   geom_point()+
   geom_smooth(method = "lm")
+
 
 
  
